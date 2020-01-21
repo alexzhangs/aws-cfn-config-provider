@@ -1,2 +1,3 @@
-# aws-cfn-config-recorder
-AWS CloudFormation Stack for Config Recorder.
+# aws-cfn-config-provider
+
+AWS CloudFormation Stack to setup AWS Config services.
