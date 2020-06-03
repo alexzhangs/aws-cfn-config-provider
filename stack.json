@@ -92,8 +92,6 @@
         "Code": { "ZipFile": { "Fn::Join": [ "\n", [
           "#!/usr/bin/env python",
           "",
-          "from __future__ import print_function",
-          "",
           "import boto3",
           "import cfnresponse",
           "",
@@ -117,7 +115,7 @@
           "        cfnresponse.send(event, context, cfnresponse.FAILED, {'error': str(e)})"
         ] ] } },
         "Handler": "index.lambda_handler",
-        "Runtime": "python2.7",
+        "Runtime": "python3.7",
         "Timeout": "15",
         "Role": {"Fn::GetAtt": ["LambdaCleanBucketOnDeleteExecutionRole", "Arn"]}
       }
