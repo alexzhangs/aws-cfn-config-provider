@@ -5,7 +5,9 @@
     "S3BucketForConfig": {
       "Type": "AWS::S3::Bucket",
       "Properties": {
-        "BucketName": {"Fn::Select": ["2", {"Fn::Split": ["/", {"Ref": "AWS::StackId"}]}]}
+        "BucketName": {"Fn::Join": ["-", [
+          "config-provider", {"Fn::Select": ["2", {"Fn::Split": ["/", {"Ref": "AWS::StackId"}]}]}
+        ]]}
       },
       "DeletionPolicy": "Delete"
     },
