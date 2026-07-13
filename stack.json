@@ -7,7 +7,30 @@
       "Properties": {
         "BucketName": {"Fn::Join": ["-", [
           "config-provider", {"Fn::Select": ["2", {"Fn::Split": ["/", {"Ref": "AWS::StackId"}]}]}
-        ]]}
+        ]]},
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true
+        },
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"},
+              "BucketKeyEnabled": true
+            }
+          ]
+        },
+        "LifecycleConfiguration": {
+          "Rules": [
+            {
+              "Id": "abort-incomplete-multipart-uploads",
+              "Status": "Enabled",
+              "AbortIncompleteMultipartUpload": {"DaysAfterInitiation": 7}
+            }
+          ]
+        }
       },
       "DeletionPolicy": "Delete"
     },
@@ -23,14 +46,16 @@
               "Effect": "Allow",
               "Principal": {"Service": ["config.amazonaws.com"]},
               "Action": "s3:GetBucketAcl",
-              "Resource": {"Fn::Sub": "arn:aws:s3:::${S3BucketForConfig}"}
+              "Resource": {"Fn::Sub": "arn:aws:s3:::${S3BucketForConfig}"},
+              "Condition": {"StringEquals": {"aws:SourceAccount": {"Ref": "AWS::AccountId"}}}
             },
             {
               "Sid": "AWSConfigBucketExistenceCheck",
               "Effect": "Allow",
               "Principal": {"Service": ["config.amazonaws.com"]},
               "Action": "s3:ListBucket",
-              "Resource": {"Fn::Sub": "arn:aws:s3:::${S3BucketForConfig}"}
+              "Resource": {"Fn::Sub": "arn:aws:s3:::${S3BucketForConfig}"},
+              "Condition": {"StringEquals": {"aws:SourceAccount": {"Ref": "AWS::AccountId"}}}
             },
             {
               "Sid": "AWSConfigBucketDelivery",
@@ -40,7 +65,8 @@
               "Resource": {"Fn::Sub": "arn:aws:s3:::${S3BucketForConfig}/*"},
               "Condition": {
                 "StringEquals": {
-                  "s3:x-amz-acl": "bucket-owner-full-control"
+                  "s3:x-amz-acl": "bucket-owner-full-control",
+                  "aws:SourceAccount": {"Ref": "AWS::AccountId"}
                 }
               }
             }
